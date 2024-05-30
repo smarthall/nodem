@@ -186,8 +186,6 @@ func (m *Modem) processAtCommand(command string) error {
 	switch command[0] {
 	case '&':
 		return m.processAtCommandExtended(command[1:])
-	case 'D':
-
 	case 'E':
 		val := command[1]
 		if val == '0' {
