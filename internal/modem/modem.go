@@ -175,6 +175,27 @@ func getNumber(s string) (int, int, error) {
 	return num, processed, nil
 }
 
+func getNumberString(s string) (string, int, error) {
+	if len(s) == 0 {
+		return "", 0, fmt.Errorf("empty string")
+	}
+
+	if s[0] < '0' || s[0] > '9' {
+		return "", 0, fmt.Errorf("invalid number")
+	}
+
+	n := ""
+	for _, c := range s {
+		if c >= '0' && c <= '9' {
+			n += string(c)
+		} else {
+			return n, len(n), nil
+		}
+	}
+
+	return n, len(n), nil
+}
+
 func (m *Modem) processAtCommand(command string) error {
 	if len(command) == 0 {
 		m.sendResponse("OK")
@@ -186,6 +207,23 @@ func (m *Modem) processAtCommand(command string) error {
 	switch command[0] {
 	case '&':
 		return m.processAtCommandExtended(command[1:])
+	case 'D':
+		charAt := 1
+
+		option := command[charAt]
+		if option == 'T' || option == 'P' {
+			charAt = 2
+		}
+
+		number, processed, err := getNumberString(command[charAt:])
+		if err != nil {
+			return fmt.Errorf("invalid number: %s", err)
+		}
+		charAt += processed
+
+		fmt.Printf("Dialing: %s\n", number)
+		m.sendResponse("CONNECT")
+		return nil
 	case 'E':
 		val := command[1]
 		if val == '0' {
