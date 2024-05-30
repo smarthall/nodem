@@ -2,8 +2,10 @@ package modem
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"io"
+	"strings"
 )
 
 type State int
@@ -34,16 +36,24 @@ func (m *Modem) Run() {
 		if err == io.EOF {
 			break
 		}
+		fmt.Printf("Read: %s:\"%s\"\n", hex.EncodeToString(c), string(c))
 		b.Write(c)
 
+		// TODO: Only if Echo is enabled
+		// TODO: Only echo non-editing characters
+		fmt.Printf("Write: %s:\"%s\"\n", hex.EncodeToString(c), string(c))
+		m.client.Write(c)
+
 		// Check if the buffer contains a command
-		if m.state == Command && c[0] == '\r' {
-			m.processCommand(b.String())
+		if m.state == Command && c[0] == 0x0d {
+			m.processCommand(strings.TrimSpace(b.String()))
 			b.Reset()
+			continue
 		}
 	}
 }
 
 func (m *Modem) processCommand(command string) {
-	fmt.Printf("Got Command: %s\n", command)
+	fmt.Printf("Command: %s\n", command)
+	m.client.Write([]byte("\r\nOK\r\n"))
 }
