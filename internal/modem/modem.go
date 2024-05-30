@@ -153,12 +153,12 @@ func (m *Modem) processCommand(command string) {
 }
 
 func getNumber(s string) (int, int, error) {
-	if s[0] < '0' || s[0] > '9' {
-		return 0, 0, fmt.Errorf("invalid number")
-	}
-
 	if len(s) == 0 {
 		return 0, 0, fmt.Errorf("empty string")
+	}
+
+	if s[0] < '0' || s[0] > '9' {
+		return 0, 0, fmt.Errorf("invalid number")
 	}
 
 	num := 0
