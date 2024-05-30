@@ -222,6 +222,8 @@ func (m *Modem) processAtCommand(command string) error {
 		charAt += processed
 
 		fmt.Printf("Dialing: %s\n", number)
+
+		// FIXME: Actually connect to something
 		m.sendResponse("CONNECT")
 		return nil
 	case 'E':
